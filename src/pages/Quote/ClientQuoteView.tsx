@@ -2,7 +2,7 @@
 import { useMemo, useState } from 'react';
 import { useStore } from '../../context/StoreContext';
 import { MOCK_REGIONS, MOCK_SKUS, type Region } from '../../mocks/data';
-import { CheckCircle, XCircle, MessageSquare, ArrowLeft } from 'lucide-react';
+import { CheckCircle, XCircle, MessageSquare } from 'lucide-react';
 import { QuoteNotification } from '../../components/common/QuoteNotification';
 import { motion } from 'framer-motion';
 
@@ -190,8 +190,8 @@ export const ClientQuoteView = () => {
                         </div>
                     ) : (
                         <div className={`p-6 rounded text-center ${actionStatus === 'approved' || state.status === 'Aprobada'
-                                ? 'bg-green-50 text-green-800 border border-green-200'
-                                : 'bg-red-50 text-red-800 border border-red-200'
+                            ? 'bg-green-50 text-green-800 border border-green-200'
+                            : 'bg-red-50 text-red-800 border border-red-200'
                             }`}>
                             <h3 className="font-heading text-xl mb-2">
                                 {actionStatus === 'approved' || state.status === 'Aprobada'

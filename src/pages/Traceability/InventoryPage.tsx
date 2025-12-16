@@ -1,6 +1,5 @@
-
 import { useState } from 'react';
-import { QrCode, ArrowRight, ArrowLeft, Package, Plus, Minus } from 'lucide-react';
+import { QrCode, ArrowLeft, Package, Plus, Minus } from 'lucide-react';
 import { MOCK_SKUS } from '../../mocks/data';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -26,7 +25,7 @@ export const InventoryPage = () => {
     };
 
     const handleGenerateQr = (skuId: string) => {
-        setGeneratedCode(`VERDI-${skuId}-${Date.now().toString().slice(-4)}`);
+        setGeneratedCode(`VERDI - ${skuId} -${Date.now().toString().slice(-4)} `);
         setShowQrModal(true);
     };
 
