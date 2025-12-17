@@ -1,37 +1,16 @@
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useStore } from '../../context/StoreContext';
-import { MOCK_REGIONS, MOCK_SKUS, type Region } from '../../mocks/data';
-import { CheckCircle, XCircle, MessageSquare } from 'lucide-react';
+import { CheckCircle, XCircle } from 'lucide-react';
 import { QuoteNotification } from '../../components/common/QuoteNotification';
-import { motion } from 'framer-motion';
+import { QuoteDocument } from '../../components/documents/QuoteDocument';
 
 export const ClientQuoteView = () => {
     const { state, dispatch } = useStore();
-    const region = MOCK_REGIONS.find((r: Region) => r.id === state.regionId) || MOCK_REGIONS[0];
     const [actionStatus, setActionStatus] = useState<'idle' | 'approved' | 'rejected'>('idle');
     const [showNotification, setShowNotification] = useState(false);
-    const [comments, setComments] = useState('');
     const [rejectReason, setRejectReason] = useState('');
     const [showRejectInput, setShowRejectInput] = useState(false);
-
-    const totals = useMemo(() => {
-        let subtotal = 0;
-        state.items.forEach(item => {
-            const sku = MOCK_SKUS.find(s => s.id === item.skuId);
-            if (sku) {
-                subtotal += sku.price * item.quantity;
-            }
-        });
-
-        const discountAmount = subtotal * state.discount;
-        const subtotalAfterDiscount = subtotal - discountAmount;
-        const taxAmount = subtotalAfterDiscount * region.taxRate;
-        const shipping = state.items.length > 0 ? region.shippingCost : 0;
-        const total = subtotalAfterDiscount + taxAmount + shipping;
-
-        return { subtotal, discountAmount, total, taxAmount, shipping };
-    }, [state.items, state.regionId, state.discount, region]);
 
     const handleApprove = () => {
         dispatch({ type: 'APPROVE_ORDER' });
@@ -52,157 +31,71 @@ export const ClientQuoteView = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 p-6 font-primary">
-            <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
-                {/* Header */}
-                <div className="bg-verdi-dark text-verdi-cream p-8 text-center">
-                    <h1 className="font-heading text-3xl tracking-widest text-verdi-gold mb-2">VERDI</h1>
-                    <p className="text-sm opacity-80 uppercase tracking-wide">Propuesta Comercial</p>
-                </div>
+        <div className="min-h-screen bg-gray-100 p-6 font-primary flex flex-col items-center">
 
-                <div className="p-8">
-                    {/* Client Info */}
-                    <div className="mb-8 p-4 bg-gray-50 rounded border border-gray-100">
-                        <h2 className="font-bold text-gray-800 mb-2">Preparado para:</h2>
-                        <p className="text-xl text-verdi-dark">{state.customerName || 'Cliente Estimado'}</p>
-                        <p className="text-gray-500 text-sm mt-1">Destino: {region.name}</p>
+            {/* The Document */}
+            <div className="bg-white shadow-2xl max-w-[210mm] w-full min-h-[297mm] mb-8 overflow-hidden">
+                <QuoteDocument date={new Date().toLocaleDateString()} />
+            </div>
+
+            {/* Actions Bar (Floating or Fixed at bottom) */}
+            <div className="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 p-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-50">
+                <div className="max-w-4xl mx-auto flex items-center justify-between gap-8">
+                    <div className="text-sm text-gray-500 hidden md:block">
+                        Revise la propuesta detallada arriba. Puede aprobarla o rechazarla directamente aquí.
                     </div>
 
-                    {/* Items */}
-                    <table className="w-full mb-8">
-                        <thead className="border-b border-gray-200">
-                            <tr>
-                                <th className="text-left py-2 font-medium text-gray-500 text-sm">Producto</th>
-                                <th className="text-center py-2 font-medium text-gray-500 text-sm">Cant</th>
-                                <th className="text-right py-2 font-medium text-gray-500 text-sm">Total</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-100">
-                            {state.items.map(item => {
-                                const sku = MOCK_SKUS.find(s => s.id === item.skuId);
-                                if (!sku) return null;
-                                return (
-                                    <tr key={item.skuId}>
-                                        <td className="py-4">
-                                            <div className="font-medium text-gray-800">{sku.name}</div>
-                                            <div className="text-xs text-gray-400">{sku.material}</div>
-                                        </td>
-                                        <td className="text-center py-4 text-gray-600">{item.quantity}</td>
-                                        <td className="text-right py-4 font-medium text-gray-800">
-                                            ${(sku.price * item.quantity).toLocaleString()}
-                                        </td>
-                                    </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
-
-                    {/* Totals */}
-                    <div className="flex justify-end mb-8">
-                        <div className="w-full md:w-1/2 space-y-2">
-                            <div className="flex justify-between text-gray-500 text-sm">
-                                <span>Subtotal</span>
-                                <span>${totals.subtotal.toLocaleString()}</span>
-                            </div>
-                            {state.discount > 0 && (
-                                <div className="flex justify-between text-verdi-gold text-sm">
-                                    <span>Descuento ({(state.discount * 100)}%)</span>
-                                    <span>- ${totals.discountAmount.toLocaleString()}</span>
-                                </div>
-                            )}
-                            <div className="flex justify-between text-gray-500 text-sm">
-                                <span>Impuestos</span>
-                                <span>${totals.taxAmount.toLocaleString()}</span>
-                            </div>
-                            <div className="flex justify-between text-gray-500 text-sm">
-                                <span>Envío</span>
-                                <span>${totals.shipping.toLocaleString()}</span>
-                            </div>
-                            <div className="flex justify-between font-heading text-xl text-verdi-dark pt-4 border-t border-gray-200 mt-2">
-                                <span>Total</span>
-                                <span>${totals.total.toLocaleString()}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Actions */}
                     {actionStatus === 'idle' && state.status !== 'Aprobada' && state.status !== 'Rechazada' ? (
-                        <div className="space-y-4">
+                        <div className="flex gap-4 w-full md:w-auto">
                             {!showRejectInput ? (
-                                <div className="flex gap-4">
-                                    <button
-                                        onClick={handleApprove}
-                                        className="flex-1 py-4 bg-green-600 text-white rounded hover:bg-green-700 transition-colors flex justify-center items-center gap-2 font-bold"
-                                    >
-                                        <CheckCircle size={20} /> Aprobar Propuesta
-                                    </button>
+                                <>
                                     <button
                                         onClick={() => setShowRejectInput(true)}
-                                        className="flex-1 py-4 bg-gray-100 text-gray-600 rounded hover:bg-gray-200 transition-colors flex justify-center items-center gap-2 font-bold"
+                                        className="flex-1 md:flex-none px-6 py-3 bg-gray-100 text-gray-600 rounded hover:bg-gray-200 transition-colors flex justify-center items-center gap-2 font-bold"
                                     >
                                         <XCircle size={20} /> Rechazar
                                     </button>
-                                </div>
+                                    <button
+                                        onClick={handleApprove}
+                                        className="flex-1 md:flex-none px-8 py-3 bg-verdi-dark text-verdi-gold rounded hover:bg-black transition-colors flex justify-center items-center gap-2 font-bold"
+                                    >
+                                        <CheckCircle size={20} /> Aprobar Propuesta
+                                    </button>
+                                </>
                             ) : (
-                                <motion.div
-                                    initial={{ opacity: 0, height: 0 }}
-                                    animate={{ opacity: 1, height: 'auto' }}
-                                    className="bg-red-50 p-4 rounded border border-red-100"
-                                >
-                                    <h4 className="font-bold text-red-800 mb-2">Motivo del Rechazo</h4>
-                                    <textarea
-                                        className="w-full p-3 border border-red-200 rounded mb-4 focus:outline-none focus:ring-2 focus:ring-red-200"
-                                        placeholder="Por favor indíquenos la razón..."
-                                        rows={3}
+                                <div className="flex-1 flex gap-2 items-center">
+                                    <input
+                                        type="text"
+                                        placeholder="Razón del rechazo..."
+                                        className="flex-1 border border-gray-300 p-2 rounded"
                                         value={rejectReason}
                                         onChange={(e) => setRejectReason(e.target.value)}
                                     />
-                                    <div className="flex gap-4">
-                                        <button
-                                            onClick={handleReject}
-                                            disabled={!rejectReason}
-                                            className="flex-1 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
-                                        >
-                                            Confirmar Rechazo
-                                        </button>
-                                        <button
-                                            onClick={() => setShowRejectInput(false)}
-                                            className="px-4 py-2 text-gray-500 hover:text-gray-700"
-                                        >
-                                            Cancelar
-                                        </button>
-                                    </div>
-                                </motion.div>
+                                    <button
+                                        onClick={handleReject}
+                                        disabled={!rejectReason}
+                                        className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
+                                    >
+                                        Confirmar
+                                    </button>
+                                    <button
+                                        onClick={() => setShowRejectInput(false)}
+                                        className="px-4 py-2 text-gray-500"
+                                    >
+                                        Cancelar
+                                    </button>
+                                </div>
                             )}
-
-                            <div className="mt-6 border-t border-gray-100 pt-6">
-                                <label className="block text-sm font-medium text-gray-500 mb-2 flex items-center gap-2">
-                                    <MessageSquare size={16} /> Agregar Comentarios (Opcional)
-                                </label>
-                                <textarea
-                                    className="w-full p-3 bg-gray-50 border border-gray-200 rounded focus:outline-none focus:border-verdi-gold"
-                                    placeholder="¿Alguna pregunta o comentario adicional?"
-                                    rows={2}
-                                    value={comments}
-                                    onChange={(e) => setComments(e.target.value)}
-                                />
-                            </div>
                         </div>
                     ) : (
-                        <div className={`p-6 rounded text-center ${actionStatus === 'approved' || state.status === 'Aprobada'
-                            ? 'bg-green-50 text-green-800 border border-green-200'
-                            : 'bg-red-50 text-red-800 border border-red-200'
+                        <div className={`p-3 rounded flex items-center gap-2 ${actionStatus === 'approved' || state.status === 'Aprobada'
+                            ? 'text-green-700 bg-green-50'
+                            : 'text-red-700 bg-red-50'
                             }`}>
-                            <h3 className="font-heading text-xl mb-2">
-                                {actionStatus === 'approved' || state.status === 'Aprobada'
-                                    ? '¡Gracias por su aprobación!'
-                                    : 'Propuesta Rechazada'}
-                            </h3>
-                            <p className="text-sm opacity-80">
-                                {actionStatus === 'approved' || state.status === 'Aprobada'
-                                    ? 'Hemos notificado al equipo y su orden está en proceso.'
-                                    : 'Hemos notificado sus comentarios al equipo comercial.'}
-                            </p>
+                            {actionStatus === 'approved' || state.status === 'Aprobada' ? <CheckCircle size={20} /> : <XCircle size={20} />}
+                            <span className="font-bold">
+                                {actionStatus === 'approved' || state.status === 'Aprobada' ? 'Propuesta Aprobada' : 'Propuesta Rechazada'}
+                            </span>
                         </div>
                     )}
                 </div>

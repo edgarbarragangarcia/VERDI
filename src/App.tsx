@@ -9,9 +9,13 @@ import { DashboardPage } from './pages/Analytics/DashboardPage';
 import ClientQuoteView from './pages/Quote/ClientQuoteView';
 import { Outlet } from 'react-router-dom';
 
+
+import { NotificationToast } from './components/common/NotificationToast';
+
 const MainLayout = () => (
   <div className="flex min-h-screen bg-verdi-cream">
     <Sidebar />
+    <NotificationToast />
     <main className="flex-1 ml-20 lg:ml-64 p-8 transition-all duration-300">
       <Outlet />
     </main>

@@ -25,7 +25,8 @@ export const InventoryPage = () => {
     };
 
     const handleGenerateQr = (skuId: string) => {
-        setGeneratedCode(`VERDI - ${skuId} -${Date.now().toString().slice(-4)} `);
+        const timestamp = new Date().getTime().toString().slice(-4);
+        setGeneratedCode(`VERDI - ${skuId} -${timestamp} `);
         setShowQrModal(true);
     };
 

@@ -2,21 +2,38 @@
 
 import { useStore } from '../../context/StoreContext';
 import { MOCK_SKUS } from '../../mocks/data';
-import { CheckCircle, Clock, Package, QrCode } from 'lucide-react';
+import { CheckCircle, Clock, Package, QrCode, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
 const StatusPage = () => {
-    const { state } = useStore();
+    const { state, dispatch } = useStore();
 
-    if (state.status === 'Borrador') {
+    if (state.status === 'Borrador' || state.status === 'PendienteCliente') {
         return (
             <div className="flex flex-col items-center justify-center h-[50vh] text-center">
                 <Package size={64} className="text-gray-300 mb-4" />
-                <h2 className="text-xl font-heading text-gray-500">No hay orden activa</h2>
-                <p className="text-gray-400 mt-2">Cree y apruebe una cotización primero.</p>
+                <h2 className="text-xl font-heading text-gray-500">No hay orden en producción</h2>
+                <p className="text-gray-400 mt-2">
+                    {state.status === 'PendienteCliente'
+                        ? 'Esperando aprobación del cliente...'
+                        : 'Cree y apruebe una cotización primero.'}
+                </p>
                 <Link to="/quote" className="mt-6 px-6 py-2 bg-verdi-dark text-white rounded hover:bg-black transition-colors">
                     Ir al Cotizador
+                </Link>
+            </div>
+        );
+    }
+
+    if (state.status === 'Rechazada') {
+        return (
+            <div className="flex flex-col items-center justify-center h-[50vh] text-center">
+                <AlertCircle size={64} className="text-red-300 mb-4" />
+                <h2 className="text-xl font-heading text-red-500">Orden Rechazada</h2>
+                <p className="text-gray-400 mt-2">El cliente ha rechazado la propuesta.</p>
+                <Link to="/quote" className="mt-6 px-6 py-2 bg-verdi-dark text-white rounded hover:bg-black transition-colors">
+                    Volver a Cotizar
                 </Link>
             </div>
         );
@@ -26,6 +43,8 @@ const StatusPage = () => {
     const progress = state.items.length > 0
         ? (Object.values(state.itemsStatus).filter(s => s === 'Terminado').length / state.items.length) * 100
         : 0;
+
+    const isNewOrder = state.status === 'Aprobada' && progress === 0;
 
     return (
         <motion.div
@@ -45,6 +64,25 @@ const StatusPage = () => {
                     </div>
                 </div>
             </header>
+
+            {isNewOrder && (
+                <motion.div
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className="mb-8 bg-green-50 border border-green-200 p-6 rounded-lg flex items-start gap-4"
+                >
+                    <div className="p-3 bg-green-100 rounded-full text-green-600">
+                        <AlertCircle size={24} />
+                    </div>
+                    <div>
+                        <h3 className="font-heading text-lg text-green-800">¡Nueva Orden de Producción!</h3>
+                        <p className="text-green-700 mt-1">
+                            El cliente ha aprobado la cotización. Los items han sido programados para producción.
+                            Escanee el código QR para comenzar a actualizar el estado de cada item.
+                        </p>
+                    </div>
+                </motion.div>
+            )}
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* QR Code Card */}
@@ -96,10 +134,20 @@ const StatusPage = () => {
                                                 <div className="text-xs text-gray-400">Qty: {item.quantity}</div>
                                             </div>
                                         </div>
-                                        <div className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-2 ${isDone ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
-                                            }`}>
-                                            {isDone ? <CheckCircle size={14} /> : <Clock size={14} />}
-                                            {status}
+                                        <div className="flex items-center gap-4">
+                                            <div className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-2 ${isDone ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                                                }`}>
+                                                {isDone ? <CheckCircle size={14} /> : <Clock size={14} />}
+                                                {status}
+                                            </div>
+                                            {!isDone && (
+                                                <button
+                                                    onClick={() => dispatch({ type: 'MARK_ITEM_TERMINATED', payload: item.skuId })}
+                                                    className="px-3 py-1 bg-verdi-dark text-white text-xs rounded hover:bg-black transition-colors"
+                                                >
+                                                    Terminar
+                                                </button>
+                                            )}
                                         </div>
                                     </div>
                                 );

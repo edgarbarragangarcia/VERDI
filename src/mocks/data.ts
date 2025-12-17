@@ -60,11 +60,38 @@ export interface OrderState {
     id: string;
     customerName: string;
     regionId: string;
-    items: { skuId: string; quantity: number }[];
+    items: OrderItem[];
     status: 'Borrador' | 'Pendiente' | 'PendienteCliente' | 'Aprobada' | 'Rechazada';
     paymentStatus: 'Pendiente' | 'Parcial' | 'Pagado';
     itemsStatus: Record<string, 'Pendiente' | 'Terminado'>; // Keyed by skuId for simplicity in mock
     discount: number; // Percentage 0-1
+}
+
+export interface CustomRugDetails {
+    weave: string;
+    combination: string;
+    border: string;
+    cut: string;
+    code: string;
+    dimensions: {
+        widthFt: number;
+        widthIn: number;
+        lengthFt: number;
+        lengthIn: number;
+        totalSqFt: number;
+        totalSqMts: number;
+    };
+    unitPrice: number;
+}
+
+export interface OrderItem {
+    skuId: string;
+    quantity: number;
+    // Optional overrides/customizations
+    name?: string;
+    price?: number;
+    category?: 'Moda' | 'Home';
+    customDetails?: CustomRugDetails;
 }
 
 export const INITIAL_ORDER_STATE: OrderState = {

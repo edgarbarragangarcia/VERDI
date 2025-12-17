@@ -17,10 +17,12 @@ export const PricingSummary = () => {
 
         state.items.forEach(item => {
             const sku = MOCK_SKUS.find(s => s.id === item.skuId);
-            if (sku) {
-                subtotal += sku.price * item.quantity;
-                totalCost += sku.cost * item.quantity;
-            }
+            const price = item.price || sku?.price || 0;
+            // For custom items, assume a cost ratio if unknown (e.g. 50%) or 0.
+            const cost = sku?.cost || (price * 0.5);
+
+            subtotal += price * item.quantity;
+            totalCost += cost * item.quantity;
         });
 
         const discountAmount = subtotal * state.discount;
@@ -156,6 +158,21 @@ export const PricingSummary = () => {
                 <div className="mt-4 p-3 bg-red-900/30 border border-red-800 text-red-200 text-sm text-center rounded">
                     <AlertCircle size={16} className="inline mr-2" />
                     Cotización Rechazada por el cliente.
+                </div>
+            )}
+
+            {Object.values(state.itemsStatus).length > 0 && Object.values(state.itemsStatus).every(s => s === 'Terminado') && state.status === 'Aprobada' && (
+                <div className="mt-4 p-4 bg-green-500 text-white shadow-lg rounded animate-pulse border border-green-400">
+                    <div className="flex items-center gap-2 mb-1 font-bold">
+                        <CheckCircle size={20} />
+                        <span>¡Producción Finalizada!</span>
+                    </div>
+                    <p className="text-sm opacity-90">
+                        El pedido está listo. Puede proceder al despacho.
+                    </p>
+                    <Link to="/shipping" className="block mt-3 bg-white text-green-600 text-center py-2 rounded font-bold text-sm hover:bg-gray-100">
+                        Ir a Despacho
+                    </Link>
                 </div>
             )}
 

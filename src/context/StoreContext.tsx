@@ -1,10 +1,10 @@
 import { createContext, useContext, useReducer, type ReactNode, useEffect } from 'react';
-import { type OrderState, INITIAL_ORDER_STATE } from '../mocks/data';
+import { type OrderState, type OrderItem, INITIAL_ORDER_STATE } from '../mocks/data';
 
 type Action =
     | { type: 'SET_CUSTOMER'; payload: string }
     | { type: 'SET_REGION'; payload: string }
-    | { type: 'ADD_ITEM'; payload: { skuId: string; quantity: number } }
+    | { type: 'ADD_ITEM'; payload: OrderItem }
     | { type: 'UPDATE_ITEM_QUANTITY'; payload: { skuId: string; quantity: number } }
     | { type: 'REMOVE_ITEM'; payload: string } // skuId
     | { type: 'SET_DISCOUNT'; payload: number }
