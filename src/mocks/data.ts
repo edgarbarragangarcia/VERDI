@@ -96,8 +96,54 @@ export interface OrderItem {
     customDetails?: CustomRugDetails;
 }
 
+export const MOCK_ORDERS: OrderState[] = [
+    {
+        id: 'ORD-2024-001',
+        customerName: 'Edgar Barragan',
+        regionId: 'COL',
+        items: [
+            { skuId: 'M001', quantity: 2, price: 450000, category: 'Moda' }
+        ],
+        status: 'Aprobada',
+        paymentStatus: 'Pagado',
+        itemsStatus: { 'M001': 'Pendiente' },
+        discount: 0,
+        productionValidated: false,
+        commercialValidated: false
+    },
+    {
+        id: 'ORD-2024-002',
+        customerName: 'Maria Gonzalez',
+        regionId: 'USA',
+        items: [
+            { skuId: 'H001', quantity: 1, price: 1200000, category: 'Home' },
+            { skuId: 'M002', quantity: 1, price: 320000, category: 'Moda' }
+        ],
+        status: 'Aprobada',
+        paymentStatus: 'Pendiente',
+        itemsStatus: { 'H001': 'Terminado', 'M002': 'Terminado' },
+        discount: 0.1,
+        productionValidated: true,
+        commercialValidated: false
+    },
+    {
+        id: 'ORD-2024-003',
+        customerName: 'Hotel Cartagena',
+        regionId: 'COL',
+        items: [
+            { skuId: 'H001', quantity: 5, price: 1100000, category: 'Home' }
+        ],
+        status: 'Aprobada',
+        paymentStatus: 'Pagado',
+        itemsStatus: { 'H001': 'Pendiente' },
+        discount: 0.15,
+        productionValidated: false,
+        commercialValidated: false
+    }
+];
+
 export const INITIAL_ORDER_STATE: OrderState = {
-    id: 'ORD-2024-001',
+    id: 'ORD-2025-NEW',
     customerName: '',
     regionId: 'COL',
     items: [],

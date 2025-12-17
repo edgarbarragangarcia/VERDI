@@ -16,7 +16,8 @@ type Action =
     | { type: 'RESET_ORDER' }
     | { type: 'VALIDATE_PRODUCTION' }
     | { type: 'VALIDATE_COMMERCIAL' }
-    | { type: 'SYNC_STATE'; payload: OrderState };
+    | { type: 'SYNC_STATE'; payload: OrderState }
+    | { type: 'LOAD_ORDER'; payload: OrderState };
 
 const StoreContext = createContext<{
     state: OrderState;
@@ -25,6 +26,8 @@ const StoreContext = createContext<{
 
 function storeReducer(state: OrderState, action: Action): OrderState {
     switch (action.type) {
+        case 'LOAD_ORDER':
+            return action.payload;
         case 'SYNC_STATE':
             return action.payload;
         case 'SET_CUSTOMER':

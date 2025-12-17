@@ -1,8 +1,8 @@
 
 import React from 'react';
 import { useStore } from '../../context/StoreContext';
-import { MOCK_SKUS } from '../../mocks/data';
-import { CheckCircle, Clock, Package, QrCode, AlertCircle } from 'lucide-react';
+import { MOCK_SKUS, MOCK_ORDERS } from '../../mocks/data';
+import { CheckCircle, Clock, Package, QrCode, AlertCircle, ChevronDown } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import QRCode from 'react-qr-code';
@@ -10,63 +10,79 @@ import QRCode from 'react-qr-code';
 const StatusPage = () => {
     const { state, dispatch } = useStore();
     const [selectedQrItem, setSelectedQrItem] = React.useState<string | null>(null);
+    const [expandedItemId, setExpandedItemId] = React.useState<string | null>(null);
 
-    if (state.status === 'Borrador' || state.status === 'PendienteCliente') {
-        return (
-            <div className="flex flex-col items-center justify-center h-[50vh] text-center">
-                <Package size={64} className="text-gray-300 mb-4" />
-                <h2 className="text-xl font-heading text-gray-500">No hay orden en producción</h2>
-                <p className="text-gray-400 mt-2">
-                    {state.status === 'PendienteCliente'
-                        ? 'Esperando aprobación del cliente...'
-                        : 'Cree y apruebe una cotización primero.'}
-                </p>
-                <Link to="/quote" className="mt-6 px-6 py-2 bg-verdi-dark text-white rounded hover:bg-black transition-colors">
-                    Ir al Cotizador
-                </Link>
-            </div>
-        );
-    }
+    // Mock "Loading" an order simulation
+    const handleOrderSelect = (orderId: string) => {
+        const order = MOCK_ORDERS.find(o => o.id === orderId);
+        if (order) {
+            dispatch({ type: 'LOAD_ORDER', payload: order });
+        }
+    };
 
-    if (state.status === 'Rechazada') {
-        return (
-            <div className="flex flex-col items-center justify-center h-[50vh] text-center">
-                <AlertCircle size={64} className="text-red-300 mb-4" />
-                <h2 className="text-xl font-heading text-red-500">Orden Rechazada</h2>
-                <p className="text-gray-400 mt-2">El cliente ha rechazado la propuesta.</p>
-                <Link to="/quote" className="mt-6 px-6 py-2 bg-verdi-dark text-white rounded hover:bg-black transition-colors">
-                    Volver a Cotizar
-                </Link>
-            </div>
-        );
-    }
+    const isBorrador = state.status === 'Borrador' || state.status === 'PendienteCliente';
 
-    // const allItemsTerminated = Object.values(state.itemsStatus).every(s => s === 'Terminado') && state.items.length > 0;
     const progress = state.items.length > 0
         ? (Object.values(state.itemsStatus).filter(s => s === 'Terminado').length / state.items.length) * 100
         : 0;
-
     const isNewOrder = state.status === 'Aprobada' && progress === 0;
+
+
 
     return (
         <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="max-w-5xl mx-auto"
+            className="max-w-6xl mx-auto"
         >
-            <header className="mb-8 flex justify-between items-end">
+            {/* Header with Selector */}
+            <header className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
                 <div>
                     <h1 className="font-heading text-3xl text-verdi-dark">Trazabilidad de Orden</h1>
-                    <p className="text-gray-500 mt-1">Orden #{state.id} • {state.customerName}</p>
-                </div>
-                <div className="text-right">
-                    <div className="text-sm text-gray-400">Estado General</div>
-                    <div className={`font-bold ${state.status === 'Aprobada' ? 'text-green-600' : 'text-yellow-600'}`}>
-                        {state.status.toUpperCase()}
+                    <div className="flex items-center gap-2 mt-2">
+                        <span className="text-gray-500 text-sm">Viendo Orden:</span>
+                        <div className="relative group">
+                            <button className="flex items-center gap-2 px-3 py-1 bg-white border border-gray-200 rounded-md shadow-sm text-sm font-bold text-verdi-dark hover:border-verdi-gold transition-colors">
+                                {state.id}
+                                <ChevronDown size={14} className="text-gray-400" />
+                            </button>
+                            {/* Dropdown */}
+                            <div className="absolute top-full left-0 mt-1 w-64 bg-white border border-gray-100 shadow-xl rounded-md overflow-hidden hidden group-hover:block z-20">
+                                <div className="p-2 bg-gray-50 border-b border-gray-100 text-xs font-bold text-gray-400 uppercase">Seleccionar Pedido</div>
+                                {MOCK_ORDERS.map(order => (
+                                    <button
+                                        key={order.id}
+                                        onClick={() => handleOrderSelect(order.id)}
+                                        className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center justify-between group/item"
+                                    >
+                                        <div>
+                                            <div className="font-bold text-verdi-dark text-sm">{order.id}</div>
+                                            <div className="text-xs text-gray-500">{order.customerName}</div>
+                                        </div>
+                                        {order.id === state.id && <CheckCircle size={14} className="text-verdi-gold" />}
+                                    </button>
+                                ))}
+                                <div className="border-t border-gray-100 p-2">
+                                    <button
+                                        onClick={() => dispatch({ type: 'RESET_ORDER' })}
+                                        className="w-full text-left px-2 py-1 text-xs text-gray-400 hover:text-verdi-dark"
+                                    >
+                                        + Nuevo / Limpiar View
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+                {!isBorrador && (
+                    <div className="text-right">
+                        <div className="text-sm text-gray-400">Estado General</div>
+                        <div className={`font - bold ${state.status === 'Aprobada' ? 'text-green-600' : 'text-yellow-600'} `}>
+                            {state.status.toUpperCase()}
+                        </div>
+                    </div>
+                )}
             </header>
-
             {isNewOrder && (
                 <motion.div
                     initial={{ scale: 0.9, opacity: 0 }}
@@ -123,7 +139,7 @@ const StatusPage = () => {
                         <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden mb-6">
                             <motion.div
                                 initial={{ width: 0 }}
-                                animate={{ width: `${progress}%` }}
+                                animate={{ width: `${progress}% ` }}
                                 className="h-full bg-green-500"
                             />
                         </div>
@@ -167,36 +183,94 @@ const StatusPage = () => {
                                 const isDone = status === 'Terminado';
 
                                 return (
-                                    <div key={item.skuId} className="p-4 flex items-center justify-between">
-                                        <div className="flex items-center gap-4">
-                                            <div className={`w-2 h-12 rounded-full ${isDone ? 'bg-green-500' : 'bg-yellow-400'}`} />
-                                            <div>
-                                                <div className="font-medium text-verdi-dark">{sku?.name}</div>
-                                                <div className="text-xs text-gray-400">Qty: {item.quantity}</div>
+                                    <div key={item.skuId} className="border-b border-gray-50 last:border-0 hover:bg-gray-50 transition-colors">
+                                        <div
+                                            className="p-4 flex items-center justify-between cursor-pointer"
+                                            onClick={() => setExpandedItemId(expandedItemId === item.skuId ? null : item.skuId)}
+                                        >
+                                            <div className="flex items-center gap-4">
+                                                <div className={`w-2 h-12 rounded-full ${isDone ? 'bg-green-500' : 'bg-yellow-400'}`} />
+                                                <div>
+                                                    <div className="font-medium text-verdi-dark flex items-center gap-2">
+                                                        {sku?.name}
+                                                        <ChevronDown
+                                                            size={16}
+                                                            className={`text-gray-400 transition-transform ${expandedItemId === item.skuId ? 'rotate-180' : ''}`}
+                                                        />
+                                                    </div>
+                                                    <div className="text-xs text-gray-400">Qty: {item.quantity} • {sku?.id}</div>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div className="flex items-center gap-4">
-                                            <div className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-2 ${isDone ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
-                                                }`}>
-                                                {isDone ? <CheckCircle size={14} /> : <Clock size={14} />}
-                                                {status}
-                                            </div>
-                                            {!isDone && (
+                                            <div className="flex items-center gap-4">
+                                                <div className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-2 ${isDone ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                                                    }`}>
+                                                    {isDone ? <CheckCircle size={14} /> : <Clock size={14} />}
+                                                    {status}
+                                                </div>
+                                                {!isDone && (
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            dispatch({ type: 'MARK_ITEM_TERMINATED', payload: item.skuId });
+                                                        }}
+                                                        className="px-3 py-1 bg-verdi-dark text-white text-xs rounded hover:bg-black transition-colors"
+                                                    >
+                                                        Terminar
+                                                    </button>
+                                                )}
                                                 <button
-                                                    onClick={() => dispatch({ type: 'MARK_ITEM_TERMINATED', payload: item.skuId })}
-                                                    className="px-3 py-1 bg-verdi-dark text-white text-xs rounded hover:bg-black transition-colors"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setSelectedQrItem(item.skuId);
+                                                    }}
+                                                    className="p-1 text-gray-400 hover:text-gray-600"
+                                                    title="Ver QR"
                                                 >
-                                                    Terminar
+                                                    <QrCode size={18} />
                                                 </button>
-                                            )}
-                                            <button
-                                                onClick={() => setSelectedQrItem(item.skuId)}
-                                                className="p-1 text-gray-400 hover:text-gray-600"
-                                                title="Ver QR"
-                                            >
-                                                <QrCode size={18} />
-                                            </button>
+                                            </div>
                                         </div>
+
+                                        {/* Expanded Detail View */}
+                                        {expandedItemId === item.skuId && (
+                                            <motion.div
+                                                initial={{ height: 0, opacity: 0 }}
+                                                animate={{ height: 'auto', opacity: 1 }}
+                                                className="bg-gray-50 px-4 pb-6 ml-10 border-l-2 border-gray-100"
+                                            >
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm mt-2">
+                                                    <div className="flex gap-4">
+                                                        {sku?.image && (
+                                                            <img
+                                                                src={sku?.image}
+                                                                alt={sku?.name}
+                                                                className="w-24 h-24 object-cover rounded-md shadow-sm border border-gray-200"
+                                                            />
+                                                        )}
+                                                        <div>
+                                                            <div className="text-xs font-bold text-gray-400 uppercase mb-1">Especificaciones</div>
+                                                            <p><span className="font-semibold">Material:</span> {sku?.material}</p>
+                                                            <p><span className="font-semibold">Categoría:</span> {sku?.category}</p>
+                                                            {item.customDetails && (
+                                                                <div className="mt-2 text-xs bg-white p-2 rounded border border-gray-200">
+                                                                    <div className="font-bold mb-1">Personalización:</div>
+                                                                    <p>Dimensiones: {item.customDetails?.dimensions?.totalSqMts} m²</p>
+                                                                    <p>Tejido: {item.customDetails?.weave}</p>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <div className="text-xs font-bold text-gray-400 uppercase mb-1">Notas de Producción</div>
+                                                        <p className="text-gray-500 italic text-xs">
+                                                            {isDone
+                                                                ? "Ítem marcado como terminado. Listo para validación final."
+                                                                : "En proceso de manufactura. Escanee el código QR o use el botón 'Terminar' al finalizar."}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </motion.div>
+                                        )}
                                     </div>
                                 );
                             })}
