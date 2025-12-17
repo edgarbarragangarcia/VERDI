@@ -15,7 +15,8 @@ type Action =
     | { type: 'MARK_PAID' }
     | { type: 'RESET_ORDER' }
     | { type: 'VALIDATE_PRODUCTION' }
-    | { type: 'VALIDATE_COMMERCIAL' };
+    | { type: 'VALIDATE_COMMERCIAL' }
+    | { type: 'SYNC_STATE'; payload: OrderState };
 
 const StoreContext = createContext<{
     state: OrderState;
@@ -24,16 +25,18 @@ const StoreContext = createContext<{
 
 function storeReducer(state: OrderState, action: Action): OrderState {
     switch (action.type) {
+        case 'SYNC_STATE':
+            return action.payload;
         case 'SET_CUSTOMER':
-            return { ...state, customerName: action.payload };
+            return { ...state, customerName: action.payload, status: 'Borrador', productionValidated: false, commercialValidated: false };
         case 'SET_REGION':
-            return { ...state, regionId: action.payload };
+            return { ...state, regionId: action.payload, status: 'Borrador', productionValidated: false, commercialValidated: false };
         case 'ADD_ITEM': {
-
+            const baseState = { ...state, status: 'Borrador' as const, productionValidated: false, commercialValidated: false };
             const existing = state.items.find(i => i.skuId === action.payload.skuId);
             if (existing) {
                 return {
-                    ...state,
+                    ...baseState,
                     items: state.items.map(i =>
                         i.skuId === action.payload.skuId
                             ? { ...i, quantity: i.quantity + action.payload.quantity }
@@ -42,7 +45,7 @@ function storeReducer(state: OrderState, action: Action): OrderState {
                 };
             }
             return {
-                ...state,
+                ...baseState,
                 items: [...state.items, action.payload],
                 itemsStatus: { ...state.itemsStatus, [action.payload.skuId]: 'Pendiente' }
             };
@@ -50,6 +53,9 @@ function storeReducer(state: OrderState, action: Action): OrderState {
         case 'UPDATE_ITEM_QUANTITY':
             return {
                 ...state,
+                status: 'Borrador',
+                productionValidated: false,
+                commercialValidated: false,
                 items: state.items.map(i =>
                     i.skuId === action.payload.skuId
                         ? { ...i, quantity: action.payload.quantity }
@@ -59,10 +65,13 @@ function storeReducer(state: OrderState, action: Action): OrderState {
         case 'REMOVE_ITEM':
             return {
                 ...state,
+                status: 'Borrador',
+                productionValidated: false,
+                commercialValidated: false,
                 items: state.items.filter(i => i.skuId !== action.payload)
             };
         case 'SET_DISCOUNT':
-            return { ...state, discount: action.payload };
+            return { ...state, discount: action.payload, status: 'Borrador', productionValidated: false, commercialValidated: false };
         case 'APPROVE_ORDER':
             return { ...state, status: 'Aprobada' };
         case 'SEND_QUOTE_TO_CLIENT':
@@ -93,6 +102,18 @@ export const StoreProvider = ({ children }: { children: ReactNode }) => {
         return persisted ? JSON.parse(persisted) : initial;
     });
 
+    // Sync across tabs
+    useEffect(() => {
+        const handleStorageChange = (e: StorageEvent) => {
+            if (e.key === 'verdi_store' && e.newValue) {
+                dispatch({ type: 'SYNC_STATE', payload: JSON.parse(e.newValue) });
+            }
+        };
+        window.addEventListener('storage', handleStorageChange);
+        return () => window.removeEventListener('storage', handleStorageChange);
+    }, []);
+
+    // Persist to local storage
     useEffect(() => {
         localStorage.setItem('verdi_store', JSON.stringify(state));
     }, [state]);

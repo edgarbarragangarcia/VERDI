@@ -139,8 +139,9 @@ const StatusPage = () => {
                                         </div>
                                         <button
                                             onClick={() => dispatch({ type: 'VALIDATE_PRODUCTION' })}
-                                            className="px-4 py-2 bg-yellow-600 text-white font-bold rounded hover:bg-yellow-700 transition-colors"
+                                            className="px-6 py-3 bg-verdi-dark text-verdi-gold font-heading font-bold rounded shadow-lg hover:bg-black hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
                                         >
+                                            <CheckCircle size={20} />
                                             Validar Producción
                                         </button>
                                     </div>
