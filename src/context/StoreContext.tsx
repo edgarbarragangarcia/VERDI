@@ -12,7 +12,8 @@ type Action =
     | { type: 'SEND_QUOTE_TO_CLIENT' }
     | { type: 'REJECT_ORDER' }
     | { type: 'MARK_ITEM_TERMINATED'; payload: string } // skuId
-    | { type: 'MARK_PAID' };
+    | { type: 'MARK_PAID' }
+    | { type: 'RESET_ORDER' };
 
 const StoreContext = createContext<{
     state: OrderState;
@@ -73,6 +74,8 @@ function storeReducer(state: OrderState, action: Action): OrderState {
             };
         case 'MARK_PAID':
             return { ...state, paymentStatus: 'Pagado' };
+        case 'RESET_ORDER':
+            return INITIAL_ORDER_STATE;
         default:
             return state;
     }

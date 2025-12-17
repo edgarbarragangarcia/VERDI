@@ -6,6 +6,7 @@ import QuotePage from './pages/Quote/QuotePage';
 import TraceabilityLayout from './pages/Traceability';
 import { ShippingRelease } from './pages/Shipping/ShippingRelease';
 import { DashboardPage } from './pages/Analytics/DashboardPage';
+import { OrdersPage } from './pages/Commercial/OrdersPage';
 import ClientQuoteView from './pages/Quote/ClientQuoteView';
 import { Outlet } from 'react-router-dom';
 
@@ -28,6 +29,7 @@ function App() {
       <Route element={<MainLayout />}>
         <Route path="/" element={<Navigate to="/quote" replace />} />
         <Route path="/quote" element={<QuotePage />} />
+        <Route path="/orders" element={<OrdersPage />} />
         <Route path="/traceability/*" element={<TraceabilityLayout />} />
         <Route path="/shipping" element={<ShippingRelease />} />
         <Route path="/analytics" element={<DashboardPage />} />

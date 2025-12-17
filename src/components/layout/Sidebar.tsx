@@ -1,6 +1,6 @@
 
 import { NavLink } from 'react-router-dom';
-import { ShoppingBag, Barcode, Truck, PieChart, User, Users, Factory, Globe } from 'lucide-react';
+import { ShoppingBag, Barcode, Truck, PieChart, User, Users, Factory, Globe, Package } from 'lucide-react';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
 import { useStore } from '../../context/StoreContext';
@@ -11,6 +11,7 @@ const ROLES = [
         icon: Users,
         items: [
             { icon: ShoppingBag, label: 'Cotizador', path: '/quote' },
+            { icon: Package, label: 'Pedidos', path: '/orders' },
             { icon: PieChart, label: 'Reportes', path: '/analytics' },
         ]
     },

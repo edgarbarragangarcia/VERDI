@@ -2,7 +2,7 @@
 import { useMemo } from 'react';
 import { useStore } from '../../context/StoreContext';
 import { MOCK_REGIONS, MOCK_SKUS, type Region } from '../../mocks/data';
-import { AlertCircle, CheckCircle, Mail, ExternalLink } from 'lucide-react';
+import { AlertCircle, CheckCircle, Mail, ExternalLink, Plus } from 'lucide-react';
 import { QuoteNotification } from '../../components/common/QuoteNotification';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -133,6 +133,15 @@ export const PricingSummary = () => {
                     </>
                 )}
             </button>
+
+            {state.status !== 'Borrador' && (
+                <button
+                    onClick={() => dispatch({ type: 'RESET_ORDER' })}
+                    className="w-full mt-4 py-3 bg-gray-700 text-white font-bold rounded hover:bg-gray-600 transition-colors flex justify-center items-center gap-2"
+                >
+                    <Plus size={20} /> Nueva Cotización (Reset)
+                </button>
+            )}
 
             {state.status === 'PendienteCliente' && (
                 <div className="mt-4 p-4 bg-blue-900/30 border border-blue-800 text-blue-200 text-sm rounded flex flex-col items-center gap-3">

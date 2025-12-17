@@ -50,7 +50,7 @@ export const ShippingRelease = () => {
 
             <div className="bg-gray-100 p-8 overflow-auto print:p-0 print:bg-white">
                 <div className="bg-white shadow-lg mx-auto print:shadow-none">
-                    <ShippingReleaseDocument date={new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })} />
+                    <ShippingReleaseDocument />
                 </div>
             </div>
         </motion.div>
