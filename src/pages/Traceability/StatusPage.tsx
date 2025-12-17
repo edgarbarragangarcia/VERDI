@@ -1,5 +1,5 @@
 
-
+import React from 'react';
 import { useStore } from '../../context/StoreContext';
 import { MOCK_SKUS } from '../../mocks/data';
 import { CheckCircle, Clock, Package, QrCode, AlertCircle } from 'lucide-react';
@@ -9,6 +9,7 @@ import QRCode from 'react-qr-code';
 
 const StatusPage = () => {
     const { state, dispatch } = useStore();
+    const [selectedQrItem, setSelectedQrItem] = React.useState<string | null>(null);
 
     if (state.status === 'Borrador' || state.status === 'PendienteCliente') {
         return (
@@ -113,19 +114,44 @@ const StatusPage = () => {
 
                 {/* Progress & List */}
                 <div className="lg:col-span-2 space-y-6">
-                    {/* Progress Bar */}
+                    {/* Progress Bar & Validation */}
                     <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
                         <div className="flex justify-between text-sm mb-2">
                             <span className="font-medium">Progreso de Producción</span>
                             <span>{Math.round(progress)}%</span>
                         </div>
-                        <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
+                        <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden mb-6">
                             <motion.div
                                 initial={{ width: 0 }}
                                 animate={{ width: `${progress}%` }}
                                 className="h-full bg-green-500"
                             />
                         </div>
+
+                        {/* Production Validation Action */}
+                        {progress === 100 && (
+                            <div className="border-t border-gray-100 pt-4">
+                                {!state.productionValidated ? (
+                                    <div className="flex items-center justify-between bg-yellow-50 p-4 rounded border border-yellow-200">
+                                        <div>
+                                            <h4 className="font-bold text-yellow-800">Confirmar Finalización</h4>
+                                            <p className="text-sm text-yellow-700">Todos los items están marcados como terminados. Valide la orden para notificar a Comercial.</p>
+                                        </div>
+                                        <button
+                                            onClick={() => dispatch({ type: 'VALIDATE_PRODUCTION' })}
+                                            className="px-4 py-2 bg-yellow-600 text-white font-bold rounded hover:bg-yellow-700 transition-colors"
+                                        >
+                                            Validar Producción
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center gap-2 text-green-700 bg-green-50 p-4 rounded border border-green-200">
+                                        <CheckCircle size={20} />
+                                        <span className="font-bold">Producción Validada Correctamente</span>
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
 
                     {/* Items List */}
@@ -162,6 +188,13 @@ const StatusPage = () => {
                                                     Terminar
                                                 </button>
                                             )}
+                                            <button
+                                                onClick={() => setSelectedQrItem(item.skuId)}
+                                                className="p-1 text-gray-400 hover:text-gray-600"
+                                                title="Ver QR"
+                                            >
+                                                <QrCode size={18} />
+                                            </button>
                                         </div>
                                     </div>
                                 );
@@ -170,6 +203,34 @@ const StatusPage = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Individual Item QR Modal */}
+            {selectedQrItem && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setSelectedQrItem(null)}>
+                    <motion.div
+                        initial={{ scale: 0.9, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        className="bg-white p-6 rounded-lg max-w-sm w-full text-center"
+                        onClick={e => e.stopPropagation()}
+                    >
+                        <h3 className="font-heading text-xl mb-4 text-verdi-dark">Código de Item</h3>
+                        <div className="bg-white p-4 rounded-xl border border-gray-100 mb-4 inline-block">
+                            <QRCode
+                                value={selectedQrItem}
+                                size={200}
+                                viewBox={`0 0 256 256`}
+                            />
+                        </div>
+                        <p className="font-mono text-sm text-gray-500 mb-6">{selectedQrItem}</p>
+                        <button
+                            onClick={() => setSelectedQrItem(null)}
+                            className="w-full py-2 bg-gray-100 font-bold rounded hover:bg-gray-200"
+                        >
+                            Cerrar
+                        </button>
+                    </motion.div>
+                </div>
+            )}
         </motion.div>
     );
 };

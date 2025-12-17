@@ -45,7 +45,10 @@ export const Sidebar = () => {
 
     // Helper to determine badge color/presence
     const getBadge = (path: string) => {
-        if ((path === '/traceability' || path === '/shipping') && hasApprovedOrder) {
+        if (path === '/traceability' && hasApprovedOrder && !state.productionValidated) {
+            return <div className="absolute right-2 top-3 w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)] animate-pulse" />;
+        }
+        if (path === '/shipping' && state.commercialValidated) {
             return <div className="absolute right-2 top-3 w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)] animate-pulse" />;
         }
         if (path === '/quote' && hasPendingClient) {

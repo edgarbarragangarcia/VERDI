@@ -65,6 +65,8 @@ export interface OrderState {
     paymentStatus: 'Pendiente' | 'Parcial' | 'Pagado';
     itemsStatus: Record<string, 'Pendiente' | 'Terminado'>; // Keyed by skuId for simplicity in mock
     discount: number; // Percentage 0-1
+    productionValidated?: boolean;
+    commercialValidated?: boolean;
 }
 
 export interface CustomRugDetails {
@@ -102,5 +104,7 @@ export const INITIAL_ORDER_STATE: OrderState = {
     status: 'Borrador',
     paymentStatus: 'Pendiente',
     itemsStatus: {},
-    discount: 0
+    discount: 0,
+    productionValidated: false,
+    commercialValidated: false
 };

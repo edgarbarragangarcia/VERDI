@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { CheckCircle, Clock, Package } from 'lucide-react';
 
 export const OrdersPage = () => {
-    const { state } = useStore();
+    const { state, dispatch } = useStore();
 
     // In a real app, we would fetch a list of orders.
     // Here we wrap the single context state in an array if it matches the criteria.
@@ -69,7 +69,7 @@ export const OrdersPage = () => {
                                     <Package size={18} />
                                     Estado de Producción
                                 </h4>
-                                <div className="space-y-4">
+                                <div className="space-y-4 mb-6">
                                     {order.items.map((item, idx) => {
                                         const sku = getSkuDetails(item.skuId);
                                         const status = order.itemsStatus[item.skuId] || 'Pendiente';
@@ -104,6 +104,45 @@ export const OrdersPage = () => {
                                             </div>
                                         );
                                     })}
+                                </div>
+
+                                {/* Commercial Validation Section */}
+                                <div className="border-t border-gray-100 pt-6">
+                                    <h4 className="font-bold text-gray-700 mb-2">Validaciones Requeridas para Despacho</h4>
+                                    <div className="flex flex-col gap-4">
+                                        {/* Production Status */}
+                                        <div className={`p-4 rounded border flex justify-between items-center ${order.productionValidated ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'}`}>
+                                            <div>
+                                                <span className="font-bold text-sm block">1. Validación Producción</span>
+                                                <span className="text-xs text-gray-500">{order.productionValidated ? 'Producción ha confirmado la finalización.' : 'Pendiente de confirmación por Producción.'}</span>
+                                            </div>
+                                            {order.productionValidated ? <CheckCircle className="text-green-600" size={20} /> : <Clock className="text-gray-400" size={20} />}
+                                        </div>
+
+                                        {/* Commercial Action */}
+                                        {order.productionValidated && (
+                                            <div className={`p-4 rounded border flex justify-between items-center ${order.commercialValidated ? 'bg-green-50 border-green-200' : 'bg-yellow-50 border-yellow-200'}`}>
+                                                <div>
+                                                    <span className="font-bold text-sm block">2. Validación Comercial</span>
+                                                    <span className="text-xs text-gray-500">
+                                                        {order.commercialValidated
+                                                            ? 'Orden validada y lista para despacho.'
+                                                            : 'Revise que la orden está lista para ser despachada.'}
+                                                    </span>
+                                                </div>
+                                                {!order.commercialValidated ? (
+                                                    <button
+                                                        onClick={() => dispatch({ type: 'VALIDATE_COMMERCIAL' })}
+                                                        className="px-4 py-2 bg-verdi-dark text-white text-sm font-bold rounded hover:bg-black transition-colors"
+                                                    >
+                                                        Aprobar para Despacho
+                                                    </button>
+                                                ) : (
+                                                    <CheckCircle className="text-green-600" size={20} />
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </motion.div>

@@ -1,6 +1,6 @@
 
 import { useStore } from '../../context/StoreContext';
-import { Truck, AlertCircle } from 'lucide-react';
+import { Truck, AlertCircle, Clock } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ShippingReleaseDocument } from '../../components/documents/ShippingReleaseDocument';
@@ -17,6 +17,28 @@ export const ShippingRelease = () => {
                 <Link to="/quote" className="mt-6 px-6 py-2 bg-verdi-dark text-white rounded hover:bg-black transition-colors">
                     Ir a Cotizaciones
                 </Link>
+            </div>
+        );
+    }
+
+    if (!state.productionValidated || !state.commercialValidated) {
+        return (
+            <div className="flex flex-col items-center justify-center h-[50vh] text-center">
+                <Clock size={64} className="text-yellow-400 mb-4" />
+                <h2 className="text-xl font-heading text-gray-500">Orden en Proceso de Validación</h2>
+                <p className="text-gray-400 mt-2 max-w-md mx-auto">
+                    {!state.productionValidated
+                        ? 'La producción aún no ha sido validada por el equipo de planta.'
+                        : 'El equipo comercial debe autorizar el despacho.'}
+                </p>
+                <div className="flex gap-4 mt-6">
+                    <Link to="/traceability" className="px-6 py-2 bg-gray-100 rounded hover:bg-gray-200 transition-colors">
+                        Ver Producción
+                    </Link>
+                    <Link to="/orders" className="px-6 py-2 bg-verdi-dark text-white rounded hover:bg-black transition-colors">
+                        Ir a Pedidos
+                    </Link>
+                </div>
             </div>
         );
     }
