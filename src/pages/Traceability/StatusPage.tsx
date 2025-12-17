@@ -5,6 +5,7 @@ import { MOCK_SKUS } from '../../mocks/data';
 import { CheckCircle, Clock, Package, QrCode, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import QRCode from 'react-qr-code';
 
 const StatusPage = () => {
     const { state, dispatch } = useStore();
@@ -88,10 +89,23 @@ const StatusPage = () => {
                 {/* QR Code Card */}
                 <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-100 flex flex-col items-center text-center">
                     <div className="bg-white p-4 rounded-xl shadow-lg border border-gray-100 mb-6">
-                        <QrCode size={120} className="text-verdi-dark" />
+                        {state.items.length > 0 ? (
+                            <QRCode
+                                value={state.items[0].skuId}
+                                size={120}
+                                viewBox={`0 0 120 120`}
+                                fgColor="#1a1a1a"
+                                bgColor="#ffffff"
+                                level="L"
+                            />
+                        ) : (
+                            <QrCode size={120} className="text-verdi-dark" />
+                        )}
                     </div>
                     <h3 className="font-heading text-lg mb-2">Código de Producción</h3>
-                    <p className="text-sm text-gray-400 mb-6">Escanee este código en el taller para actualizar estados.</p>
+                    <p className="text-sm text-gray-400 mb-6 font-mono">
+                        {state.items.length > 0 ? state.items[0].skuId : 'Sin items'}
+                    </p>
                     <Link to="/traceability/scan" className="w-full px-4 py-3 bg-verdi-gold text-verdi-dark font-medium rounded hover:bg-yellow-500 transition-colors">
                         Abrir Escáner Móvil
                     </Link>

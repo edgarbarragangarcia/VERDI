@@ -2,6 +2,7 @@
 import React from 'react';
 import { useStore } from '../../context/StoreContext';
 import { MOCK_REGIONS, MOCK_SKUS, type Region } from '../../mocks/data';
+import QRCode from 'react-qr-code';
 
 
 
@@ -204,9 +205,18 @@ export const ShippingReleaseDocument: React.FC = () => {
             <div className="grid grid-cols-2 gap-4">
                 <div>
                     <div className="border border-black mb-2">
-                        <div className="bg-gray-100 font-bold text-center border-b border-black p-1 text-[10px]">Observations</div>
-                        <div className="p-2 h-20 text-[10px]">
-                            {/* Empty space for observations */}
+                        <div className="bg-gray-100 font-bold text-center border-b border-black p-1 text-[10px]">Observations & Tracking</div>
+                        <div className="p-2 h-20 text-[10px] flex items-center justify-between">
+                            <span className="text-gray-400 italic">No special instructions.</span>
+                            {/* Shipping QR */}
+                            <div className="border border-gray-200 bg-white p-1">
+                                <QRCode
+                                    value={`SHIPPING-${state.id}`}
+                                    size={64}
+                                    style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+                                    viewBox={`0 0 256 256`}
+                                />
+                            </div>
                         </div>
                     </div>
                     <div className="border border-black flex">
@@ -252,6 +262,6 @@ export const ShippingReleaseDocument: React.FC = () => {
                 </div>
             </div>
 
-        </div>
+        </div >
     );
 };
