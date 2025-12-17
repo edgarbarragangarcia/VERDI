@@ -2,7 +2,7 @@
 import React from 'react';
 import { useStore } from '../../context/StoreContext';
 import { MOCK_SKUS, MOCK_ORDERS } from '../../mocks/data';
-import { CheckCircle, Clock, Package, QrCode, AlertCircle, ChevronDown } from 'lucide-react';
+import { CheckCircle, Clock, QrCode, AlertCircle, ChevronDown } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import QRCode from 'react-qr-code';

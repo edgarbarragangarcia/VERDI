@@ -1,19 +1,18 @@
-import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Star, Shield, Globe } from 'lucide-react';
+import { ArrowRight, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const LandingPage = () => {
     return (
-        <div className="min-h-screen bg-verdi-dark text-white font-sans overflow-hidden relative">
+        <div className="h-screen bg-verdi-dark text-white font-sans overflow-hidden relative flex flex-col">
             {/* Background Texture/Gradient */}
-            <div className="absolute inset-0 z-0 opacity-20">
+            <div className="absolute inset-0 z-0 opacity-20 pointer-events-none">
                 <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-verdi-gold/20 to-transparent" />
                 <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-verdi-gold/10 rounded-full blur-[100px]" />
             </div>
 
             {/* Navbar */}
-            <nav className="relative z-10 px-8 py-6 flex justify-between items-center max-w-7xl mx-auto">
+            <nav className="relative z-10 px-8 py-6 flex-none flex justify-between items-center max-w-7xl mx-auto w-full">
                 <div className="flex items-center gap-2">
                     <div className="w-8 h-8 bg-verdi-gold rounded-full flex items-center justify-center text-verdi-dark font-bold font-heading">V</div>
                     <span className="text-xl font-heading tracking-widest text-white">VERDI</span>
@@ -24,34 +23,34 @@ const LandingPage = () => {
             </nav>
 
             {/* Hero Section */}
-            <main className="relative z-10 max-w-7xl mx-auto px-8 pt-20 lg:pt-32 pb-20">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <main className="relative z-10 flex-1 flex items-center justify-center px-8 w-full max-w-7xl mx-auto">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center w-full">
                     <motion.div
                         initial={{ opacity: 0, x: -50 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.8 }}
                     >
-                        <h1 className="text-5xl lg:text-7xl font-heading leading-tight mb-8">
+                        <h1 className="text-5xl lg:text-6xl font-heading leading-tight mb-6">
                             Artesanía <br />
                             <span className="text-verdi-gold italic">Redefinida.</span>
                         </h1>
-                        <p className="text-gray-300 text-lg mb-10 max-w-lg leading-relaxed font-light">
+                        <p className="text-gray-300 text-lg mb-8 max-w-lg leading-relaxed font-light">
                             Fusionamos fibras naturales con metales nobles para crear piezas de interiorismo que cuentan historias de tradición y lujo contemporáneo.
                         </p>
 
-                        <div className="flex flex-col sm:flex-row gap-4">
+                        <div className="flex flex-col sm:flex-row gap-4 mb-10">
                             <Link
                                 to="/login"
-                                className="px-8 py-4 bg-verdi-gold text-verdi-dark text-center font-bold font-heading rounded hover:bg-white transition-all transform hover:scale-105 flex items-center justify-center gap-2"
+                                className="px-8 py-3 bg-verdi-gold text-verdi-dark text-center font-bold font-heading rounded hover:bg-white transition-all transform hover:scale-105 flex items-center justify-center gap-2"
                             >
                                 Iniciar Sesión <ArrowRight size={20} />
                             </Link>
-                            <button className="px-8 py-4 border border-white/20 text-white font-medium rounded hover:bg-white/10 transition-all text-center">
+                            <button className="px-8 py-3 border border-white/20 text-white font-medium rounded hover:bg-white/10 transition-all text-center">
                                 Explorar Colección
                             </button>
                         </div>
 
-                        <div className="mt-16 flex gap-8 border-t border-white/10 pt-8">
+                        <div className="flex gap-8 border-t border-white/10 pt-6">
                             <div>
                                 <h3 className="text-2xl font-heading text-white">25+</h3>
                                 <p className="text-xs text-gray-400 uppercase tracking-wider mt-1">Países</p>
@@ -71,10 +70,10 @@ const LandingPage = () => {
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 1, delay: 0.2 }}
-                        className="relative hidden lg:block"
+                        className="relative hidden lg:block h-[60vh] max-h-[600px]"
                     >
                         {/* Abstract Art Representation */}
-                        <div className="relative w-full h-[600px] rounded-2xl overflow-hidden shadow-2xl border border-white/10">
+                        <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl border border-white/10">
                             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10" />
                             <img
                                 src="https://images.unsplash.com/photo-1596200219609-b63cf4c7cae5?auto=format&fit=crop&q=80&w=800"
